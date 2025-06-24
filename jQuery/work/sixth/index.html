@@ -47,24 +47,31 @@
     $(function () {
       $('#wrapper').on('click', '#pokemon_search', function () {
         let randomId = Math.floor(Math.random() * 151) + 1;
-
-        $.ajax({
+        let getPokemon = $.ajax({
           url: `https://pokeapi.co/api/v2/pokemon/${randomId}`,
           method: 'GET',
-        }).done(function (data) {
-          let name = data.name;
+        });
+        let getSpecies = $.ajax({
+          url: `https://pokeapi.co/api/v2/pokemon-species/${randomId}`,
+          method: 'GET',
+        });
+        $.when(getPokemon, getSpecies).done(function (pokemonRes, speciesRes) {
+          let data = pokemonRes[0];
+          let species = speciesRes[0];
           let image = data.sprites.front_default;
+          let japaneseName = species.names.find(function (n) {
+            return n.language.name === 'ja-Hrkt';
+          })?.name || data.name;
+
           $('#wrapper').html(encountHtml);
-          $('.name').text(name);
-          $('.img').attr('src', image).attr('alt', name);
+          $('.name').text(japaneseName);
+          $('.img').attr('src', image).attr('alt', japaneseName);
         }).fail(function () {
           alert('ポケモンの取得に失敗しました');
         });
       });
-
       $('#wrapper').on('click', '#catch', function () {
         let success = Math.random() < 0.5;
-
         if (success) {
           $.ajax({
             url: 'https://pokeapi.co/api/v2/item/4',
@@ -80,7 +87,6 @@
           $('#wrapper').html(failHtml);
         }
       });
-
       $('#wrapper').on('click', '[data-js="reset"]', function () {
         $('#wrapper').html('<button type="button" class="btn search-btn" id="pokemon_search">ポケモンを探す</button>');
       });
