@@ -104,20 +104,23 @@
     $(function () {
       function filterList() {
         const selectedValue = $('.select').val();
-        $('.list li').each(function (index, element) {
-          const categoryType = $(element).data('category-type');
-
-          if (selectedValue === 'all' || selectedValue === categoryType) {
-            $(element).show();
-          } else {
-            $(element).hide();
-          }
-        });
+        if (selectedValue === 'all') {
+          $('.list li').show();
+        } else {
+          $('.list li').each(function (index, element) {
+            const categoryType = $(element).data('category-type');
+            if (selectedValue === categoryType) {
+              $(element).show();
+            } else {
+              $(element).hide();
+            }
+          });
+        }
       }
       $('.select').change(function () {
         filterList();
       });
-      filterList();
+      filterList(); // 初期表示にも対応
     });
   </script>
 </body>
